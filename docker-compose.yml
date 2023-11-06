@@ -1,0 +1,10 @@
+version: "3.7"
+services:
+  sch21_parser:
+    build:
+      context: .
+    env_file:
+      - .env
+    container_name: sch21_parser
+    ports:
+      - 1998:1998
