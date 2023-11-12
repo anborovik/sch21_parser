@@ -1,6 +1,7 @@
 """Parser module"""
 import os
 import time
+from datetime import datetime
 
 from dotenv import load_dotenv
 import requests
@@ -23,12 +24,12 @@ def parser():
     bearer = login_user()
     while True:
         time.sleep(60)
-        mettings = requests.get(
-            URL_METTINGS,
-            headers={"Authorization": bearer},
-            timeout=3
-        )
         try:
+            mettings = requests.get(
+                URL_METTINGS,
+                headers={"Authorization": bearer},
+                timeout=10
+            )
             dates = mettings.json()["meetings"]
             if dates != []:
                 meeting_id = dates[0]["id"]
@@ -54,10 +55,14 @@ def parser():
                 message = f"You are subscribed to School21 webinar {date_time} {address}. Webinar link {webinar_url}"
                 return send_message(message, "anastasia.borovik.1998@mail.ru")
             else:
-                print("No meetings available.")
+                print(f"[{datetime.now()}]No meetings available.")
                 continue
         except KeyError:
             bearer = login_user()
+            continue
+        except requests.exceptions.ReadTimeout:
+            print(f"[{datetime.now()}]Runtime error.")
+            time.sleep(60)
             continue
 
 
@@ -72,7 +77,7 @@ def login_user() -> str:
     login = requests.post(URL_LOGIN, json=login_body, timeout=3)
     if login.status_code == 200:
         return login.json()["Authorization"]
-    print(f"Login failed. Status code {login.status_code}.")
+    print(f"[{datetime.now()}]Login failed. Status code {login.status_code}.")
     return os.getenv("BEARER")
 
 

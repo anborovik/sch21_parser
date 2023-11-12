@@ -3,4 +3,4 @@ WORKDIR /tgbot
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY . .
-RUN python3 sch21_parser.py
+CMD [ "python3", "./sch21_parser.py"]
