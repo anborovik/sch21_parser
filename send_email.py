@@ -1,4 +1,5 @@
 """Mailing module"""
+import logging
 import os
 import smtplib
 
@@ -20,6 +21,8 @@ def send_message(message: str, email: str) -> str:
                 to_addrs=email,
                 msg=message.encode('utf8')
             )
+        logging.info("SUCCESS")
         return "SUCCESS"
     except Exception as exc:
+        logging.error(f"{exc}")
         return exc

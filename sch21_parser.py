@@ -1,7 +1,7 @@
 """Parser module"""
+import logging
 import os
 import time
-from datetime import datetime
 
 from dotenv import load_dotenv
 import requests
@@ -17,6 +17,12 @@ URL_MY_MEETING = "https://applicant.21-school.ru/api/v3/meetings_users/piscine"
 
 EMAIL = os.getenv("EMAIL")
 PASSWORD = os.getenv("PASSWORD")
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] %(levelname)s %(message)s"
+)
 
 
 def parser():
@@ -55,13 +61,13 @@ def parser():
                 message = f"You are subscribed to School21 webinar {date_time} {address}. Webinar link {webinar_url}"
                 return send_message(message, "anastasia.borovik.1998@mail.ru")
             else:
-                print(f"[{datetime.now()}]No meetings available.")
+                logging.info("No meetings available.")
                 continue
         except KeyError:
             bearer = login_user()
             continue
         except requests.exceptions.ReadTimeout:
-            print(f"[{datetime.now()}]Runtime error.")
+            logging.error("Runtime error.")
             time.sleep(60)
             continue
 
@@ -77,8 +83,8 @@ def login_user() -> str:
     login = requests.post(URL_LOGIN, json=login_body, timeout=3)
     if login.status_code == 200:
         return login.json()["Authorization"]
-    print(f"[{datetime.now()}]Login failed. Status code {login.status_code}.")
+    logging.info(f"Login failed. Status code {login.status_code}.")
     return os.getenv("BEARER")
 
 
-print(parser())
+parser()
